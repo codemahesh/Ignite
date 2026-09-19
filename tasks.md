@@ -16,8 +16,9 @@ Each task lists `Depends:` by ID. Tasks with no shared dependency can run in par
   Depends: — · Accept: `cognee` connects to Postgres+pgvector and Neo4j from a local script; `prune.prune_data()` + `prune_system(metadata=True)` run once cleanly.
   **Done (local-first deviation, see memory/OPS-1.md):** local Docker Postgres+pgvector (port 5436) + Homebrew-installed Neo4j (Docker Hub CDN had a TLS trust failure on this machine). Verified by independent subagent — `backend/scripts/verify_infra.py` passes end-to-end.
 
-- [ ] **BE-1** [BE] FastAPI skeleton with `--workers 1` pinned in the start command, `CORSMiddleware` wired to `FRONTEND_ORIGIN`, `GET /health` (process-alive only, no dependency calls).
+- [x] **BE-1** [BE] FastAPI skeleton with `--workers 1` pinned in the start command, `CORSMiddleware` wired to `FRONTEND_ORIGIN`, `GET /health` (process-alive only, no dependency calls).
   Depends: — · Accept: deployed service responds 200 on `/health`; browser call from deployed frontend origin isn't blocked by CORS.
+  **Done (local, see memory/BE-1.md):** `backend/app/main.py` + `start.sh`. Verified by independent subagent — /health 200, CORS allows FRONTEND_ORIGIN and rejects others, --workers 1 confirmed on the live process.
 
 - [ ] **FE-1** [FE] Next.js skeleton, `NEXT_PUBLIC_API_BASE_URL` env var wired, deployed to Render.
   Depends: — · Accept: deployed page loads and successfully calls `BE-1`'s `/health`.
