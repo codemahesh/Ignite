@@ -32,8 +32,9 @@ Each task lists `Depends:` by ID. Tasks with no shared dependency can run in par
 
 ## Phase 1 — Data Layer & Schema
 
-- [ ] **BE-2** [BE] Postgres schema: `artifacts` (id, connector_id, content_hash, cognee_doc_id, source, type, topic, title, author, url, created_at, updated_at, ingested_at), `watermarks` (source, last_synced_at), `jobs`/`sync_jobs`, `dead_letters`, `connectors` (registry table per v2 §2.1).
+- [x] **BE-2** [BE] Postgres schema: `artifacts` (id, connector_id, content_hash, cognee_doc_id, source, type, topic, title, author, url, created_at, updated_at, ingested_at), `watermarks` (source, last_synced_at), `jobs`/`sync_jobs`, `dead_letters`, `connectors` (registry table per v2 §2.1).
   Depends: OPS-1 · Accept: all tables created via migration; each has a primary key and the FKs in the architecture docs.
+  **Done (see memory/BE-2.md):** SQLAlchemy models + Alembic migration `c753346f2811`. Verified by independent subagent — all 5 tables exist with PKs; FKs match doc literal SQL exactly (including dead_letters' deliberate lack of FK); FK enforcement proven live with a real rejected insert.
 
 - [ ] **BE-3** [BE] `GET /ready` — checks Neo4j + Postgres + Cognee config reachable (distinct from `/health`).
   Depends: BE-2 · Accept: returns 200 only when all three dependencies respond; used manually before demo, not by the pinger.
