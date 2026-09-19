@@ -44,8 +44,9 @@ Each task lists `Depends:` by ID. Tasks with no shared dependency can run in par
 
 ## Phase 2 — Canonical Ingestion (Seed Data First)
 
-- [ ] **BE-4** [BE] `Artifact` dataclass (canonical envelope) + `SourceConnector` protocol (`fetch(since) -> Iterable[Artifact]`).
+- [x] **BE-4** [BE] `Artifact` dataclass (canonical envelope) + `SourceConnector` protocol (`fetch(since) -> Iterable[Artifact]`).
   Depends: — · Accept: importable module, typed, matches architecture §3 field list exactly.
+  **Done (see memory/BE-4.md):** `app/artifact.py`, verbatim from arch §3. Verified by independent subagent — field-for-field match, mypy structural typing confirmed with both a positive and a negative (error-catching) test.
 
 - [ ] **BE-5** [BE] Artifact-ID resolution: write artifacts to disk as `<artifact_id>.md` with `<!-- artifact_id: ... | source: ... | date: ... -->` header comment, tag `node_set=["artifact:{id}", "source:{...}", "topic:{...}"]`. One resolver function with all three fallback routes, logs which one fired.
   Depends: BE-4 · Accept: given a Cognee search result, resolver returns the correct `artifact.id` via at least one route in a test case.
