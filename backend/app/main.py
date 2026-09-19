@@ -1,10 +1,12 @@
 import asyncio
 
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 from app.config import get_settings
 from app.readiness import check_cognee_config, check_neo4j, check_postgres
+from app.pdf_qa import process_pdf_and_ask, reset_pdf_dataset
 
 settings = get_settings()
 
@@ -17,6 +19,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+class PDFQuestionRequest(BaseModel):
+    pdf_path: str
+    question: str
 
 
 @app.get("/health")
@@ -44,3 +51,31 @@ async def ready(response: Response) -> dict:
         "neo4j": {"ok": neo4j_ok, "error": neo4j_err},
         "cognee_config": {"ok": cognee_ok, "error": cognee_err},
     }
+
+
+@app.post("/pdf/ask")
+async def ask_pdf(request: PDFQuestionRequest) -> dict:
+    """Ask a question about a PDF document.
+    
+    This endpoint processes a PDF and answers natural language questions about it.
+    Perfect for demo purposes!
+    """
+    try:
+        # Try simple version first (faster, no ML setup needed)
+        from app.simple_pdf_qa import simple_pdf_qa
+        result = simple_pdf_qa(request.pdf_path, request.question)
+        return result
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing PDF: {str(e)}")
+
+
+@app.post("/pdf/reset")
+async def reset_pdf() -> dict:
+    """Reset the PDF dataset (useful for demos to start fresh)."""
+    try:
+        await reset_pdf_dataset()
+        return {"status": "success", "message": "PDF dataset reset"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error resetting: {str(e)}")
