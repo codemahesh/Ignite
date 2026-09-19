@@ -20,8 +20,9 @@ Each task lists `Depends:` by ID. Tasks with no shared dependency can run in par
   Depends: — · Accept: deployed service responds 200 on `/health`; browser call from deployed frontend origin isn't blocked by CORS.
   **Done (local, see memory/BE-1.md):** `backend/app/main.py` + `start.sh`. Verified by independent subagent — /health 200, CORS allows FRONTEND_ORIGIN and rejects others, --workers 1 confirmed on the live process.
 
-- [ ] **FE-1** [FE] Next.js skeleton, `NEXT_PUBLIC_API_BASE_URL` env var wired, deployed to Render.
+- [x] **FE-1** [FE] Next.js skeleton, `NEXT_PUBLIC_API_BASE_URL` env var wired, deployed to Render.
   Depends: — · Accept: deployed page loads and successfully calls `BE-1`'s `/health`.
+  **Done (local, see memory/FE-1.md):** Next.js 16.3.5 at `frontend/`, port 3010. Verified by independent subagent — build clean, page loads, cross-origin call to backend /health succeeds.
 
 - [ ] **OPS-2** [OPS] External uptime pinger hitting `/health` every 10 minutes from first deploy onward.
   Depends: BE-1 · Accept: pinger configured and firing; service does not cold-start on first judge request.
