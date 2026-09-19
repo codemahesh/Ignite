@@ -1,0 +1,36 @@
+name: Keep-alive pinger
+
+# OPS-2: external uptime pinger. Render's free web services spin down after
+# inactivity (v1 §6, "Cold starts"). This hits /health every 10 minutes so a
+# judge is never the request that wakes the service.
+#
+# Setup once deployed: Settings -> Secrets and variables -> Actions ->
+# Variables -> new repository variable HEALTH_CHECK_URL, e.g.
+#   https://company-brain-api.onrender.com/health
+# Until that variable is set, this workflow no-ops instead of failing loudly
+# (see the "not yet configured" step) — deliberate, so it doesn't spam
+# failure notifications before there's anything to ping.
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /health
+        env:
+          HEALTH_CHECK_URL: ${{ vars.HEALTH_CHECK_URL }}
+        run: |
+          if [ -z "$HEALTH_CHECK_URL" ]; then
+            echo "HEALTH_CHECK_URL repo variable not set yet — nothing to ping (expected pre-deploy). See comment at top of this file."
+            exit 0
+          fi
+          status=$(curl -sS -o /dev/null -w "%{http_code}" -m 15 "$HEALTH_CHECK_URL")
+          echo "GET $HEALTH_CHECK_URL -> $status"
+          if [ "$status" != "200" ]; then
+            echo "::error::Health check failed with status $status"
+            exit 1
+          fi

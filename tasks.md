@@ -24,8 +24,9 @@ Each task lists `Depends:` by ID. Tasks with no shared dependency can run in par
   Depends: — · Accept: deployed page loads and successfully calls `BE-1`'s `/health`.
   **Done (local, see memory/FE-1.md):** Next.js 16.3.5 at `frontend/`, port 3010. Verified by independent subagent — build clean, page loads, cross-origin call to backend /health succeeds.
 
-- [ ] **OPS-2** [OPS] External uptime pinger hitting `/health` every 10 minutes from first deploy onward.
+- [~] **OPS-2** [OPS] External uptime pinger hitting `/health` every 10 minutes from first deploy onward.
   Depends: BE-1 · Accept: pinger configured and firing; service does not cold-start on first judge request.
+  **Blocked on deployment (see memory/OPS-2.md):** `.github/workflows/keep-alive.yml` built and verified (cron every 10min, correct curl/no-op logic, actionlint-clean). Cannot fire for real or prove the cold-start guarantee until deployed — set the `HEALTH_CHECK_URL` repo variable after first Render deploy, no code changes needed.
 
 ---
 
