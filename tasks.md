@@ -52,8 +52,9 @@ Each task lists `Depends:` by ID. Tasks with no shared dependency can run in par
   Depends: BE-4 · Accept: given a Cognee search result, resolver returns the correct `artifact.id` via at least one route in a test case.
   **Done (see memory/BE-5.md):** `app/artifact_resolver.py` + `tests/test_artifact_resolver.py` (8 tests). Verified by independent subagent — all 3 routes work via both primary and alternate keys, real round-trip write→resolve, logging confirmed firing.
 
-- [ ] **BE-6** [BE] Write deliberate seed corpus: artifacts forming a real multi-hop chain (Policy → Decision → Incident) and a real date-based contradiction (two same-topic docs, different `updated_at`). Dense and unambiguous, not "realistic filler."
+- [x] **BE-6** [BE] Write deliberate seed corpus: artifacts forming a real multi-hop chain (Policy → Decision → Incident) and a real date-based contradiction (two same-topic docs, different `updated_at`). Dense and unambiguous, not "realistic filler."
   Depends: BE-4 · Accept: corpus reviewed by hand — the intended chain and conflict are unambiguous from reading the text alone.
+  **Done (see memory/BE-6.md):** `app/seed_corpus.py`, 6 artifacts. Hand-reviewed by independent subagent — chain and contradiction both judged unambiguous from text alone; one borderline link strengthened to an exact-title quote afterward.
 
 - [ ] **BE-7** [BE] `SeedFileConnector` implementing the connector protocol over BE-6's corpus.
   Depends: BE-4, BE-6 · Accept: `fetch(since=None)` yields all seed artifacts as valid `Artifact` objects.
