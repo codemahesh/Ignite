@@ -2,6 +2,13 @@
 
 **Status: done (local-first deviation, verified by independent subagent).**
 
+> ⚠️ **DANGER, found during BE-8 — read before calling `cognee.prune.prune_system(metadata=True)` ANYWHERE:**
+> `prune_system(metadata=True)` calls `get_relational_engine().delete_database()` — this drops **every table in the connected Postgres database**, not just cognee's own tables. Since we deliberately share one Postgres database (`company_brain`) between cognee's tables and our own (`connectors`/`artifacts`/`watermarks`/`jobs`/`dead_letters` from BE-2), calling `prune_system(metadata=True)` **silently deletes our entire application schema too**. This happened during BE-8's development — the schema had to be recreated with `alembic upgrade head`.
+> - `prune_data()` alone is safe to call repeatedly — it only clears local file storage (`data_root_directory`), never touches the relational DB.
+> - `prune_system(graph=True, vector=True, metadata=False)` (i.e. explicitly `metadata=False`) is safe for resetting cognee's graph/vector state without touching Postgres at all — **prefer this over the default for any routine test reset**.
+> - Only call `prune_system(metadata=True)` for a genuine full teardown, and **immediately run `alembic upgrade head` afterward** to restore our own schema before doing anything else.
+> - `verify_infra.py` (below) calls the full `prune_system(metadata=True)` because OPS-1's literal acceptance criterion asked for exactly that call — re-running that script later will wipe the app schema again; re-migrate after.
+
 ## What was built
 
 - `docker-compose.yml` (repo root): `postgres` service using `pgvector/pgvector:pg16`, host port **5436** (not 5432 — that and 5433/5434/5435 were already bound by unrelated containers on this dev machine). Container name `company-brain-postgres`.
@@ -11,6 +18,17 @@
   - Running as a background service: `brew services start neo4j` / `brew services list` to check / `brew services stop neo4j` to stop.
   - Bolt: `bolt://localhost:7687`. HTTP browser: `http://localhost:7474`.
   - The `docker-compose.yml`'s `neo4j` service definition is left in place (harmless, unused locally) so the compose file stays correct for any environment where Docker Hub actually works.
+  - **Addendum (found during BE-8): needs the APOC plugin, not installed by default.** cognee's Neo4j adapter calls `apoc.create.addLabels` on every `cognify()` — without it, cognify fails with `Neo.ClientError.Procedure.ProcedureNotFound`. The Docker `neo4j` service already had `NEO4J_PLUGINS: '["apoc"]'` for exactly this reason, but the Homebrew install needs manual activation:
+    ```
+    brew services stop neo4j
+    NEO4J_HOME=$(brew --prefix neo4j)
+    cp "$NEO4J_HOME/libexec/labs/apoc-2026.08.1-core.jar" "$NEO4J_HOME/libexec/plugins/"
+    echo "dbms.security.procedures.unrestricted=apoc.*" >> "$NEO4J_HOME/libexec/conf/neo4j.conf"
+    brew services start neo4j
+    # verify:
+    echo "RETURN apoc.version();" | cypher-shell -u neo4j -p local_dev_password
+    ```
+    (The jar version string must match the installed Neo4j version — check `libexec/labs/` for the actual filename if Neo4j gets upgraded via brew.) OPS-1's original verification (`verify_infra.py`) only ran `RETURN 1`, which doesn't exercise APOC — that's why this wasn't caught until BE-8 actually ran a real `cognify()`. **If Neo4j ever gets reinstalled/upgraded via Homebrew, redo this — it's not persisted anywhere brew manages automatically.**
 - `backend/.venv` — Python **3.11.15** venv (project Python 3.9.6 is too old; cognee requires `>=3.10,<3.15`). Homebrew python at `/opt/homebrew/bin/python3.11`.
 - `backend/requirements.txt` — key pins: `cognee[postgres-binary,neo4j]==1.6.0`, `fastapi>=0.116.2`, `sqlalchemy>=2.0.39` (cognee 1.6.0's actual floor; below that pip's resolver fails). Full transitive install succeeded.
 - `backend/.env.example` + `backend/.env` (gitignored) — see below for the exact vars and why.

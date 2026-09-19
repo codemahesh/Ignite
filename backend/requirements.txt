@@ -8,7 +8,7 @@ psycopg2-binary>=2.9.10
 alembic==1.14.0
 cryptography==44.0.0
 httpx==0.28.1
-cognee[postgres-binary,neo4j]==1.6.0
+cognee[postgres-binary,neo4j,gliner]==1.6.0
 pytest==8.3.4
 pytest-asyncio==0.25.0
 mypy
