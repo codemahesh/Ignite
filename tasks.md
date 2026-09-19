@@ -56,8 +56,9 @@ Each task lists `Depends:` by ID. Tasks with no shared dependency can run in par
   Depends: BE-4 · Accept: corpus reviewed by hand — the intended chain and conflict are unambiguous from reading the text alone.
   **Done (see memory/BE-6.md):** `app/seed_corpus.py`, 6 artifacts. Hand-reviewed by independent subagent — chain and contradiction both judged unambiguous from text alone; one borderline link strengthened to an exact-title quote afterward.
 
-- [ ] **BE-7** [BE] `SeedFileConnector` implementing the connector protocol over BE-6's corpus.
+- [x] **BE-7** [BE] `SeedFileConnector` implementing the connector protocol over BE-6's corpus.
   Depends: BE-4, BE-6 · Accept: `fetch(since=None)` yields all seed artifacts as valid `Artifact` objects.
+  **Done (see memory/BE-7.md):** `app/seed_connector.py` + 5 tests. Verified by independent subagent — mypy structural conformance, since-filter correctness, and an exact ordered id-list spot-check (nothing dropped/duplicated/invented).
 
 - [ ] **BE-8** [BE] Ingestion runner: `cognee.add()` per artifact via BE-5's ID-carrying path, staged through Postgres `artifacts` table first (crash-safe replay), then `cognee.cognify(datasets="company_brain")`. Enforce delete-before-re-add on content-hash change (skip if `a.id == b.id` in conflict module as the safety net).
   Depends: BE-2, BE-5, BE-7 · Accept: running the seed corpus through this produces a queryable Cognee dataset; re-running with one artifact edited replaces it instead of duplicating.
