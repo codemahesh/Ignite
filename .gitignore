@@ -31,3 +31,10 @@ yarn-error.log*
 .DS_Store
 .vscode/
 .idea/
+
+# Claude Code session-local state
+.claude/
+
+# cognee local data (created by the backend venv/scripts)
+backend/.data_storage/
+backend/.cognee_system/

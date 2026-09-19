@@ -12,8 +12,9 @@ Each task lists `Depends:` by ID. Tasks with no shared dependency can run in par
 
 ## Phase 0 — Foundation (deploy first, stakes low)
 
-- [ ] **OPS-1** [OPS] Provision Render Postgres, Neo4j Aura Free, set all env vars from architecture §6 (`LLM_API_KEY`, `GRAPH_DATABASE_*`, `DB_*`, `TAVILY_API_KEY`, `CREDENTIAL_ENCRYPTION_KEY`). Confirm exact Cognee env var names against installed version's docs.
+- [x] **OPS-1** [OPS] Provision Render Postgres, Neo4j Aura Free, set all env vars from architecture §6 (`LLM_API_KEY`, `GRAPH_DATABASE_*`, `DB_*`, `TAVILY_API_KEY`, `CREDENTIAL_ENCRYPTION_KEY`). Confirm exact Cognee env var names against installed version's docs.
   Depends: — · Accept: `cognee` connects to Postgres+pgvector and Neo4j from a local script; `prune.prune_data()` + `prune_system(metadata=True)` run once cleanly.
+  **Done (local-first deviation, see memory/OPS-1.md):** local Docker Postgres+pgvector (port 5436) + Homebrew-installed Neo4j (Docker Hub CDN had a TLS trust failure on this machine). Verified by independent subagent — `backend/scripts/verify_infra.py` passes end-to-end.
 
 - [ ] **BE-1** [BE] FastAPI skeleton with `--workers 1` pinned in the start command, `CORSMiddleware` wired to `FRONTEND_ORIGIN`, `GET /health` (process-alive only, no dependency calls).
   Depends: — · Accept: deployed service responds 200 on `/health`; browser call from deployed frontend origin isn't blocked by CORS.
