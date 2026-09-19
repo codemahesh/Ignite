@@ -36,8 +36,9 @@ Each task lists `Depends:` by ID. Tasks with no shared dependency can run in par
   Depends: OPS-1 · Accept: all tables created via migration; each has a primary key and the FKs in the architecture docs.
   **Done (see memory/BE-2.md):** SQLAlchemy models + Alembic migration `c753346f2811`. Verified by independent subagent — all 5 tables exist with PKs; FKs match doc literal SQL exactly (including dead_letters' deliberate lack of FK); FK enforcement proven live with a real rejected insert.
 
-- [ ] **BE-3** [BE] `GET /ready` — checks Neo4j + Postgres + Cognee config reachable (distinct from `/health`).
+- [x] **BE-3** [BE] `GET /ready` — checks Neo4j + Postgres + Cognee config reachable (distinct from `/health`).
   Depends: BE-2 · Accept: returns 200 only when all three dependencies respond; used manually before demo, not by the pinger.
+  **Done (see memory/BE-3.md):** `app/readiness.py` + `/ready` in `main.py`. Verified by independent subagent — 200 when healthy, 503 with per-dependency detail when Neo4j is down, `/health` unaffected. Not wired into the OPS-2 pinger.
 
 ---
 
