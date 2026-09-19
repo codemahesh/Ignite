@@ -48,8 +48,9 @@ Each task lists `Depends:` by ID. Tasks with no shared dependency can run in par
   Depends: — · Accept: importable module, typed, matches architecture §3 field list exactly.
   **Done (see memory/BE-4.md):** `app/artifact.py`, verbatim from arch §3. Verified by independent subagent — field-for-field match, mypy structural typing confirmed with both a positive and a negative (error-catching) test.
 
-- [ ] **BE-5** [BE] Artifact-ID resolution: write artifacts to disk as `<artifact_id>.md` with `<!-- artifact_id: ... | source: ... | date: ... -->` header comment, tag `node_set=["artifact:{id}", "source:{...}", "topic:{...}"]`. One resolver function with all three fallback routes, logs which one fired.
+- [x] **BE-5** [BE] Artifact-ID resolution: write artifacts to disk as `<artifact_id>.md` with `<!-- artifact_id: ... | source: ... | date: ... -->` header comment, tag `node_set=["artifact:{id}", "source:{...}", "topic:{...}"]`. One resolver function with all three fallback routes, logs which one fired.
   Depends: BE-4 · Accept: given a Cognee search result, resolver returns the correct `artifact.id` via at least one route in a test case.
+  **Done (see memory/BE-5.md):** `app/artifact_resolver.py` + `tests/test_artifact_resolver.py` (8 tests). Verified by independent subagent — all 3 routes work via both primary and alternate keys, real round-trip write→resolve, logging confirmed firing.
 
 - [ ] **BE-6** [BE] Write deliberate seed corpus: artifacts forming a real multi-hop chain (Policy → Decision → Incident) and a real date-based contradiction (two same-topic docs, different `updated_at`). Dense and unambiguous, not "realistic filler."
   Depends: BE-4 · Accept: corpus reviewed by hand — the intended chain and conflict are unambiguous from reading the text alone.
