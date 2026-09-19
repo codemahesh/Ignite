@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
-import cognee
+from app.cognee_client import get_cognee
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +22,8 @@ async def process_pdf_and_ask(pdf_path: str, question: str) -> dict[str, Any]:
         Dictionary with answer and sources
     """
     try:
+        cognee = get_cognee()
+        
         # Verify the PDF exists
         pdf_file = Path(pdf_path)
         if not pdf_file.exists():
@@ -84,6 +86,7 @@ async def process_pdf_and_ask(pdf_path: str, question: str) -> dict[str, Any]:
 async def reset_pdf_dataset():
     """Reset the PDF demo dataset for a fresh start."""
     try:
+        cognee = get_cognee()
         await cognee.prune.prune_data(dataset_name=DATASET_NAME)
         await cognee.prune.prune_system(metadata=True)
         logger.info("PDF dataset reset successfully")

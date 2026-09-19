@@ -29,8 +29,7 @@ import logging
 from pathlib import Path
 from uuid import UUID
 
-import cognee
-
+from app.cognee_client import get_cognee
 from app.artifact import Artifact, SourceConnector
 from app.artifact_resolver import node_set_for, write_artifact_file
 from app.db import SessionLocal
@@ -54,6 +53,7 @@ async def _get_dataset_id(name: str) -> UUID | None:
     """cognee.update() needs a dataset UUID, not a name. Looked up fresh each
     run rather than cached — this project uses exactly one dataset (v2 §2.1
     decision #10), so this is one cheap call, not a per-artifact cost."""
+    cognee = get_cognee()
     datasets = await cognee.datasets.list_datasets()
     for dataset in datasets:
         if getattr(dataset, "name", None) == name:
@@ -66,6 +66,7 @@ async def ingest_artifacts(connector: SourceConnector, since=None) -> dict[str, 
 
     Returns counts: {fetched, added, updated, unchanged, retried}.
     """
+    cognee = get_cognee()
     artifacts = list(connector.fetch(since))
     counts = {"fetched": len(artifacts), "added": 0, "updated": 0, "unchanged": 0, "retried": 0}
 
